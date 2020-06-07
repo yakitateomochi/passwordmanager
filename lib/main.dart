@@ -33,7 +33,7 @@ class _MyHomePageState extends State<MyHomePage> {
 
   void _didPushEditButton() {
     setState(() {
-      print('edit pressed');
+      print('pushed edit_button1');
     });
   }
 
