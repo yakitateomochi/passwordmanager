@@ -1,9 +1,28 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:passwordapp/add_page.dart';
+import 'package:sqflite/sqflite.dart';
+import 'package:path/path.dart';
 
 void main() {
   runApp(MyApp());
+}
+createDatabase() async {
+  final databaseName = 'my.db';
+  final databasesPath = await getDatabasesPath();
+  final dbPath = join(databasesPath, databaseName);
+  var database = await openDatabase(dbPath, version: 1, onCreate: populateDb);
+  return database;
+}
+
+void populateDb(Database database, int version) async {
+  await database.execute(
+      "CREATE TABLE Passwords("
+      "id INTEGER PRIMARY KEY,"
+      "name TEXT,"
+      "password TEXT"
+      ")"
+  );
 }
 
 class MyApp extends StatelessWidget {
@@ -28,6 +47,7 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
+
   var _listTitle = ['ama','face','goo','app'];
   var _listPassword = ['hoge1','hoge2','hoge3','hoge4','hoge5'];
 
