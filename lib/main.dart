@@ -5,7 +5,8 @@ import 'package:sqflite/sqflite.dart';
 import 'package:path/path.dart';
 Database db;
 
-void main() async {
+void main() {
+  WidgetsFlutterBinding.ensureInitialized();
   creationDatabase();
   runApp(MyApp());
 }
@@ -23,6 +24,7 @@ creationDatabase() async {
       );
     },
   );
+  return db;
 }
 
 class MyApp extends StatelessWidget {
@@ -48,10 +50,9 @@ class MyHomePage extends StatefulWidget {
 
 class _MyHomePageState extends State<MyHomePage> {
   //TODO: DBからdisplayName,passwordのリストを取得
-  List<Passwords> _passwords = [];
   //仮のデータベース
-  var _listDisplayName = ['ama','face','goo','app'];
-  var _listPassword = ['hoge1','hoge2','hoge3','hoge4','hoge5'];
+  final _listDisplayName = ['ama','face','goo','app'];
+  final _listPassword = ['hoge1','hoge2','hoge3','hoge4','hoge5'];
 
   @override
   Widget build(BuildContext context) {
@@ -84,8 +85,8 @@ class _MyHomePageState extends State<MyHomePage> {
                     IconButton(
                       icon: Icon(Icons.content_copy),
                       onPressed: () {
-                        final coppiedPassword = ClipboardData(text: _listPassword[index]);
-                        Clipboard.setData(coppiedPassword);
+                        final copiedPassword = ClipboardData(text: _listPassword[index]);
+                        Clipboard.setData(copiedPassword);
                       },
                     ),
                     IconButton(
@@ -103,7 +104,7 @@ class _MyHomePageState extends State<MyHomePage> {
     );
   }
 
-  //TODO: Edit画面作成
+  //TODO: Edit画面と処理の作成
   void _didPushEditButton() {
     print('didPushEditButton');
   }
@@ -130,7 +131,8 @@ class Passwords {
   }
 }
 
-Future _insertPassword(Database db, String displayName, String password) async {
+//DB挿入処理
+Future<void> _insertPassword(Database db, String displayName, String password) async {
   var values = <String, dynamic>{
     'displayName': displayName,
     'password': password,
@@ -138,6 +140,7 @@ Future _insertPassword(Database db, String displayName, String password) async {
   await db.insert('Passwords', values);
 }
 
+//DB取得処理
 Future<List<Passwords>> _getAllPasswords(Database db) async{
   List<Map> results = await db.query('Passwords');
   return results.map((Map m) {
@@ -147,6 +150,7 @@ Future<List<Passwords>> _getAllPasswords(Database db) async{
   }).toList();
 }
 
+//DB更新処理
 Future _updatePassword(Database db, int id, String displayName, String password) async {
   var values = <String, dynamic>{
     'displayName': displayName,
@@ -155,6 +159,7 @@ Future _updatePassword(Database db, int id, String displayName, String password)
   await db.update('Passwords', values, where: '_id=?', whereArgs: [id]);
 }
 
+//DB削除処理
 Future _deletePassword(Database db, Passwords passwords) async {
   await db.delete(
       'passwords',
