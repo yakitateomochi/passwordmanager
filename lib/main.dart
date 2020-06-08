@@ -1,12 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:passwordapp/add_page.dart';
+import 'package:passwordapp/model/passwords.dart';
 import 'package:sqflite/sqflite.dart';
 import 'package:path/path.dart';
 
 void main() {
   runApp(MyApp());
 }
+
 createDatabase() async {
   final databaseName = 'my.db';
   final databasesPath = await getDatabasesPath();
