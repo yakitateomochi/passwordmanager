@@ -4,9 +4,31 @@ import 'package:passwordapp/add_page.dart';
 import 'package:passwordapp/model/passwords.dart';
 import 'package:sqflite/sqflite.dart';
 import 'package:path/path.dart';
+import 'dart:async';
 
 void main() {
   runApp(MyApp());
+  createDatabase();
+}
+
+class Passwords {
+  int id;
+  String name;
+  String password;
+
+  Passwords({
+    this.id,
+    this.name,
+    this.password,
+  });
+
+  Map<String, dynamic> toMap() {
+    return {
+      'id': id,
+      'name': name,
+      'password': password,
+    };
+  }
 }
 
 createDatabase() async {
@@ -19,11 +41,7 @@ createDatabase() async {
 
 void populateDb(Database database, int version) async {
   await database.execute(
-      "CREATE TABLE Passwords("
-      "id INTEGER PRIMARY KEY,"
-      "name TEXT,"
-      "password TEXT"
-      ")"
+      "CREATE TABLE Passwords(id INTEGER PRIMARY KEY, name TEXT, password TEXT)",
   );
 }
 
@@ -49,7 +67,6 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-
   var _listTitle = ['ama','face','goo','app'];
   var _listPassword = ['hoge1','hoge2','hoge3','hoge4','hoge5'];
 
