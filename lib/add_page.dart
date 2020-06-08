@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 final myFocusNode = FocusNode();
 final myController = TextEditingController();
@@ -54,10 +53,9 @@ class addPage extends StatelessWidget {
                 RaisedButton(
                   child: Text('登録'),
                   onPressed: () async {
-                    SharedPreferences prefs = await SharedPreferences.getInstance();
-                    await prefs.setString(newName, newPassword);
                     print(newName);
-                    print(newPassword);                  },
+                    print(newPassword);
+                    },
                 ),
                 RaisedButton(
                   child: Text('キャンセル'),

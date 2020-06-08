@@ -3,27 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:passwordapp/add_page.dart';
 import 'package:sqflite/sqflite.dart';
 import 'package:path/path.dart';
-Datase db;
-
-class Passwords {
-  int id;
-  String displayName;
-  String password;
-
-  Passwords({
-    this.id,
-    this.displayName,
-    this.password,
-  });
-
-  Map<String, dynamic> toMap() {
-    return {
-      'id': id,
-      'displayName': displayName,
-      'password': password,
-    };
-  }
-}
+Database db;
 
 void main() async {
   creationDatabase();
@@ -39,36 +19,10 @@ creationDatabase() async {
     version: 1,
     onCreate: (database, version) {
       return database.execute(
-        "CREATE TABLE TBL_Passwords(id INTEGER PRIMARY KEY, displayName TEXT, password TEXT)",
+        "CREATE TABLE Passwords(id INTEGER PRIMARY KEY, displayName TEXT, password TEXT)",
       );
     },
   );
-  return db;
-}
-
-Future<void> _insertPassword(Database db, String displayName, String password) async {
-  var values = <String, dynamic>{
-    'displayName': displayName,
-    'password': password,
-  };
-  await db.insert('TBL_Passwords', values);
-}
-
-Future<List<TBL_Passwords>> _getAllPasswords(Database db) async{
-  List<Map> results = await db.query('TBL_Passwords');
-  return results.map((Map m) {
-    int id = m['_id'];
-    String displayName = m['displayName'];
-    String password = m['password'];
-  }).toList();
-}
-
-Future _updatePassword(Database db, int id, String displayName, String password) async {
-  var values = <String, dynamic>{
-    'displayName': displayName,
-    'password': password,
-  };
-  await db.update('TBL_Passwords', values, where: "_id=?", whereArgs: [id]);
 }
 
 class MyApp extends StatelessWidget {
@@ -93,9 +47,10 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-  //TODO: DB取得できているか確認
+  //TODO: DBからdisplayName,passwordのリストを取得
+  List<Passwords> _passwords = [];
   //仮のデータベース
-  var _listTitle = ['ama','face','goo','app'];
+  var _listDisplayName = ['ama','face','goo','app'];
   var _listPassword = ['hoge1','hoge2','hoge3','hoge4','hoge5'];
 
   @override
@@ -117,12 +72,12 @@ class _MyHomePageState extends State<MyHomePage> {
         ],
       ),
       body: ListView.builder(
-        itemCount: _listTitle.length,
+        itemCount: _listDisplayName.length,
         itemBuilder: (context, index) {
           return Column(
             children: <Widget>[
               ListTile(
-                title: Text(_listTitle[index]),
+                title: Text(_listDisplayName[index]),
                 trailing: Wrap(
                   spacing: 8,
                   children: <Widget>[
@@ -148,8 +103,62 @@ class _MyHomePageState extends State<MyHomePage> {
     );
   }
 
+  //TODO: Edit画面作成
   void _didPushEditButton() {
     print('didPushEditButton');
   }
 
+}
+
+class Passwords {
+  int id;
+  String displayName;
+  String password;
+
+  Passwords({
+    this.id,
+    this.displayName,
+    this.password,
+  });
+
+  Map<String, dynamic> toMap() {
+    return {
+      'id': id,
+      'displayName': displayName,
+      'password': password,
+    };
+  }
+}
+
+Future _insertPassword(Database db, String displayName, String password) async {
+  var values = <String, dynamic>{
+    'displayName': displayName,
+    'password': password,
+  };
+  await db.insert('Passwords', values);
+}
+
+Future<List<Passwords>> _getAllPasswords(Database db) async{
+  List<Map> results = await db.query('Passwords');
+  return results.map((Map m) {
+    int id = m['_id'];
+    String displayName = m['displayName'];
+    String password = m['password'];
+  }).toList();
+}
+
+Future _updatePassword(Database db, int id, String displayName, String password) async {
+  var values = <String, dynamic>{
+    'displayName': displayName,
+    'password': password,
+  };
+  await db.update('Passwords', values, where: '_id=?', whereArgs: [id]);
+}
+
+Future _deletePassword(Database db, Passwords passwords) async {
+  await db.delete(
+      'passwords',
+      where: '_id=?',
+      whereArgs: [passwords.id]
+  );
 }
