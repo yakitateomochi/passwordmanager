@@ -1,48 +1,74 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:passwordapp/add_page.dart';
-import 'package:passwordapp/model/passwords.dart';
 import 'package:sqflite/sqflite.dart';
 import 'package:path/path.dart';
-import 'dart:async';
-
-void main() {
-  runApp(MyApp());
-  createDatabase();
-}
+Datase db;
 
 class Passwords {
   int id;
-  String name;
+  String displayName;
   String password;
 
   Passwords({
     this.id,
-    this.name,
+    this.displayName,
     this.password,
   });
 
   Map<String, dynamic> toMap() {
     return {
       'id': id,
-      'name': name,
+      'displayName': displayName,
       'password': password,
     };
   }
 }
 
-createDatabase() async {
+void main() async {
+  creationDatabase();
+  runApp(MyApp());
+}
+
+creationDatabase() async {
   final databaseName = 'my.db';
   final databasesPath = await getDatabasesPath();
   final dbPath = join(databasesPath, databaseName);
-  var database = await openDatabase(dbPath, version: 1, onCreate: populateDb);
-  return database;
+  final db = openDatabase(
+    dbPath,
+    version: 1,
+    onCreate: (database, version) {
+      return database.execute(
+        "CREATE TABLE TBL_Passwords(id INTEGER PRIMARY KEY, displayName TEXT, password TEXT)",
+      );
+    },
+  );
+  return db;
 }
 
-void populateDb(Database database, int version) async {
-  await database.execute(
-      "CREATE TABLE Passwords(id INTEGER PRIMARY KEY, name TEXT, password TEXT)",
-  );
+Future<void> _insertPassword(Database db, String displayName, String password) async {
+  var values = <String, dynamic>{
+    'displayName': displayName,
+    'password': password,
+  };
+  await db.insert('TBL_Passwords', values);
+}
+
+Future<List<TBL_Passwords>> _getAllPasswords(Database db) async{
+  List<Map> results = await db.query('TBL_Passwords');
+  return results.map((Map m) {
+    int id = m['_id'];
+    String displayName = m['displayName'];
+    String password = m['password'];
+  }).toList();
+}
+
+Future _updatePassword(Database db, int id, String displayName, String password) async {
+  var values = <String, dynamic>{
+    'displayName': displayName,
+    'password': password,
+  };
+  await db.update('TBL_Passwords', values, where: "_id=?", whereArgs: [id]);
 }
 
 class MyApp extends StatelessWidget {
@@ -67,14 +93,10 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
+  //TODO: DB取得できているか確認
+  //仮のデータベース
   var _listTitle = ['ama','face','goo','app'];
   var _listPassword = ['hoge1','hoge2','hoge3','hoge4','hoge5'];
-
-  void _didPushEditButton() {
-    setState(() {
-      print('pushed edit_button1');
-    });
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -95,7 +117,6 @@ class _MyHomePageState extends State<MyHomePage> {
         ],
       ),
       body: ListView.builder(
-        padding: EdgeInsets.all(0.0),
         itemCount: _listTitle.length,
         itemBuilder: (context, index) {
           return Column(
@@ -108,8 +129,8 @@ class _MyHomePageState extends State<MyHomePage> {
                     IconButton(
                       icon: Icon(Icons.content_copy),
                       onPressed: () {
-                        final coppiedtext = ClipboardData(text: _listPassword[index]);
-                        Clipboard.setData(coppiedtext);
+                        final coppiedPassword = ClipboardData(text: _listPassword[index]);
+                        Clipboard.setData(coppiedPassword);
                       },
                     ),
                     IconButton(
@@ -126,4 +147,9 @@ class _MyHomePageState extends State<MyHomePage> {
       ),
     );
   }
+
+  void _didPushEditButton() {
+    print('didPushEditButton');
+  }
+
 }
