@@ -36,19 +36,12 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
-      home: MyHomePage(title: 'パスワード管理'),
+      home: MyHome(),
     );
   }
 }
 
-class MyHomePage extends StatefulWidget {
-  MyHomePage({Key key, this.title}) : super(key: key);
-  final String title;
-  @override
-  _MyHomePageState createState() => _MyHomePageState();
-}
-
-class _MyHomePageState extends State<MyHomePage> {
+class MyHome extends StatelessWidget {
   //TODO: DBからdisplayName,passwordのリストを取得
   //仮のデータベース
   final _listDisplayName = ['ama','face','goo','app'];
@@ -58,7 +51,7 @@ class _MyHomePageState extends State<MyHomePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(widget.title, textAlign: TextAlign.center,),
+        title: Text('パスワード管理', textAlign: TextAlign.center,),
         centerTitle: true,
         actions: <Widget>[
           IconButton(
@@ -66,7 +59,7 @@ class _MyHomePageState extends State<MyHomePage> {
             onPressed: () async {
               await Navigator.push(
                 context,
-                MaterialPageRoute(builder: (context) => addPage()),
+                MaterialPageRoute(builder: (context) => new addPage()),
               );
             },
           ),
@@ -103,13 +96,12 @@ class _MyHomePageState extends State<MyHomePage> {
       ),
     );
   }
+}
 
   //TODO: Edit画面と処理の作成
   void _didPushEditButton() {
     print('didPushEditButton');
   }
-
-}
 
 class Passwords {
   int id;
