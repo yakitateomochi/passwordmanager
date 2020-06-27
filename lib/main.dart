@@ -44,7 +44,7 @@ class MyApp extends StatelessWidget {
 class MyHome extends StatelessWidget {
   //TODO: DBからdisplayName,passwordのリストを取得
   //仮のデータベース
-  final _listDisplayName = ['ama','face','goo','app'];
+  final _listDisplayName = ['ama','face','goo','appl'];
   final _listPassword = ['hoge1','hoge2','hoge3','hoge4','hoge5'];
 
   @override
